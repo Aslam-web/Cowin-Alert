@@ -1,4 +1,4 @@
-package EmailApp;
+package EmailApp.sender;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -16,7 +16,9 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-public class BulkEmail {
+import EmailApp.Patient;
+
+public class BulkEmailSender {
 
 	private Properties props;
 	private Session session;
@@ -27,7 +29,7 @@ public class BulkEmail {
 	private int failedMessages;
 	private String status;
 
-	public BulkEmail() {
+	public BulkEmailSender() {
 		this.props = new Properties();
 	}
 
@@ -37,7 +39,7 @@ public class BulkEmail {
 	}
 
 	// setRecipients()
-	public void sendMail(List<Patient> patients) throws IOException {
+	public void sendMail(List<Patient> patients) throws Exception {
 		this.patients = patients;
 
 		// loads the neccessary properties to connect to the smtp server from file
@@ -55,12 +57,12 @@ public class BulkEmail {
 
 	}
 
-	private void startThreadOperation() {
+	private void startThreadOperation() throws InterruptedException {
 
 		// initializing thread count and details displayed
-		System.out.println("Total no.of recipients: " + this.patients.size());
-		System.out.println("Thread Count : " + this.threadCount);
-		System.out.println("Preparing the messages ...\n----------------------------------------------");
+		System.out.print("Total no.of Patients: " + this.patients.size());
+		System.out.println(",\tThread Count : " + this.threadCount);
+		System.out.println("----------------------------------------------\nPreparing the messages ...\n");
 
 		// process starts
 		long startTime = System.currentTimeMillis();
@@ -73,11 +75,7 @@ public class BulkEmail {
 		}
 
 		for (Thread thread : threads) {
-			try {
-				thread.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			thread.join();
 		}
 
 		// prints the results of the progress
@@ -98,8 +96,7 @@ public class BulkEmail {
 				(System.currentTimeMillis() - startTime) / 1000, threadCount);
 	}
 
-	// connect() is responsible for creating [i.e via createMessage()] and sending
-	// message
+	// Creates [i.e via createMessage()] and sends message
 	private void send(Patient patient) {
 
 		try {
@@ -115,14 +112,14 @@ public class BulkEmail {
 		}
 	}
 
-	// creates the message body
+	// Constructs the message
 	private Message createMessage(Patient patient) {
 
 		Message message = new MimeMessage(session);
 		try {
 			message.setFrom(new InternetAddress(props.getProperty("EMAIL")));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(patient.getEmail()));
-			message.setSubject("Recogniztion for getting the CoviShield vaccine");
+			message.setSubject("Recogniztion for getting the Covid-19 vaccine");
 
 			Multipart multipart = new MimeMultipart();
 
@@ -133,7 +130,7 @@ public class BulkEmail {
 			// attachment
 			MimeBodyPart file = new MimeBodyPart();
 			file.attachFile(patient.getExcelFile());
-			
+
 			multipart.addBodyPart(text1);
 			multipart.addBodyPart(file);
 			message.setContent(multipart);
@@ -147,11 +144,12 @@ public class BulkEmail {
 		return message;
 	}
 
+	// The job allocated for the threads
 	private class MyRunnable implements Runnable {
 
 		@Override
 		public void run() {
-			for (; count < patients.size();) {
+			while (count < patients.size()) {
 
 				int localCount = 0;
 				synchronized (this) {

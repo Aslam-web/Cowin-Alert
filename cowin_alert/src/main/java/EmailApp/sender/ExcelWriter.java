@@ -1,4 +1,4 @@
-package EmailApp;
+package EmailApp.sender;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,16 +15,18 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import EmailApp.Patient;
+
 public class ExcelWriter {
 	
-	
+	private static final String DATA_STORE = "data/generated_files/";
 
 	public static List<Patient> createExcelForAll(Set<Patient> patientDetails) throws IOException{
 
 		List<Patient> patientList = new ArrayList<>();
 		
 		Workbook wb = null;
-		FileOutputStream output;
+		FileOutputStream output = null;
 		Patient p;
 		String destination;
 		Sheet sheet;
@@ -36,7 +38,8 @@ public class ExcelWriter {
 			
 			// get the patient and set the excel file location on that object
 			p = iter.next();
-			destination = "data/" + p.getName() + "'s Details.xls";
+			String fileName = p.getName() + "'s Details.xls";
+			destination = DATA_STORE + fileName;
 			p.setExcelFile(destination);
 			patientList.add(p);
 			
@@ -89,34 +92,19 @@ public class ExcelWriter {
 
 		System.out.println("Excel file successfully created for all the patients !!!");
 		
+		output.close();
 		wb.close();
 		return patientList;
 	}
+
+	public static void print(Set<Patient> patientDetails) {
+		System.out.println("\n-----------------Printing Data-----------------------\n");
+		Iterator<Patient> iter = patientDetails.iterator();
+		while(iter.hasNext()) {
+			Patient p = iter.next();
+			System.out.printf("%s\t\t%s\t\t\t%s\t\t\t%s\t\t%s\t\t\t%s\n",
+					p.getEmail(),p.getName(),p.getAddress(),p.getVacCenter(),p.getTime(),p.getVacName(),p.getExcelFile());
+		}
+	}
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

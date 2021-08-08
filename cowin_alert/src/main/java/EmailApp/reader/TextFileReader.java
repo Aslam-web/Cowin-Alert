@@ -14,8 +14,7 @@ public class TextFileReader extends MyDataReader<String> {
 	public Set<Patient> read(String filename) {
 		Set<Patient> patientSet = new HashSet<>();
 		
-		System.out.println("READING DATABASE !!!");
-		try {Thread.sleep(1000);} catch (Exception e1) {}
+		System.out.print("Reading data from Text file ...");
 
 		try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
 			
@@ -35,10 +34,10 @@ public class TextFileReader extends MyDataReader<String> {
 			}
 
 			try {Thread.sleep(1000);} catch (Exception e1) {}		// dummy 
-			System.out.println("DATABASE READ SUCCESSFULLY !!!");
+			System.out.println("\tFILE READ SUCCESSFULLY !!!");
 
 		} catch (IOException e) {
-			System.out.println("ERROR READING DATABASE !!!");
+			System.out.println("\tERROR READING DATABASE !!!");
 			e.printStackTrace();
 		}
 

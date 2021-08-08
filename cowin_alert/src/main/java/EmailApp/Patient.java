@@ -3,8 +3,8 @@ package EmailApp;
 // POJO - Plain Old Java Object
 
 public class Patient {
-	private String email,name,address,vacCenter,time ,id ;
-	private String excelFile,vacName;	
+	private String email,name,address,vacCenter,vacName,time,id;
+	private String excelFile;	
 
 	public String getId() {
 		return id;
